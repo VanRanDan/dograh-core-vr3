@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "VR3 AI",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#2BB5D8",
+    "light": "#5CCCEC",
+    "dark": "#1B3A8A"
   },
   "favicon": "/favicon.ico",
   "navigation": {

@@ -7,9 +7,9 @@
 button[data-testid*="search"],
 .mintlify-search,
 .DocSearch-Button {
-  background: rgba(22, 163, 74, 0.05) !important;
-  border: 3px solid #16A34A !important;
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2), 0 4px 12px rgba(22, 163, 74, 0.15) !important;
+  background: rgba(43, 181, 216, 0.05) !important;
+  border: 3px solid #2BB5D8 !important;
+  box-shadow: 0 0 0 2px rgba(43, 181, 216, 0.2), 0 4px 12px rgba(43, 181, 216, 0.15) !important;
   border-radius: 10px !important;
   transition: all 0.3s ease !important;
   min-width: 280px !important;
@@ -24,7 +24,7 @@ button[data-testid*="search"]:hover,
 .mintlify-search:hover,
 .DocSearch-Button:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(43, 181, 216, 0.4) !important;
 }
 
 /* Search text and icon styling - Better visibility */
@@ -35,15 +35,15 @@ button[data-testid*="search"]:hover,
 button[data-testid*="search"] *,
 .mintlify-search *,
 .DocSearch-Button * {
-  color: #16A34A !important;
+  color: #2BB5D8 !important;
   font-weight: 500 !important;
 }
 
 /* Pulse animation */
 @keyframes search-pulse {
-  0% { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
-  50% { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.6); }
-  100% { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
+  0% { box-shadow: 0 4px 12px rgba(43, 181, 216, 0.3); }
+  50% { box-shadow: 0 4px 12px rgba(43, 181, 216, 0.6); }
+  100% { box-shadow: 0 4px 12px rgba(43, 181, 216, 0.3); }
 }
 
 /* Apply animation to all search elements */
@@ -56,4 +56,3 @@ button[data-testid*="search"],
 .DocSearch-Button {
   animation: search-pulse 2s ease-in-out infinite !important;
 }
-
