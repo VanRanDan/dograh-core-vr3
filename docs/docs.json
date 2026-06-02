@@ -7,7 +7,7 @@
     "light": "#5CCCEC",
     "dark": "#1B3A8A"
   },
-  "favicon": "/favicon.ico",
+  "favicon": "/logo/vr3logo.png",
   "navigation": {
     "tabs": [
       {
@@ -273,7 +273,8 @@
   "logo": {
     "light": "/logo/vr3logo.png",
     "dark": "/logo/vr3logo.png",
-    "href": "https://vr3ai.tapcloud.org"
+    "href": "https://vr3ai.tapcloud.org",
+    "height": 56
   },
   "navbar": {
     "links": [],
