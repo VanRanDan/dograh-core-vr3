@@ -284,7 +284,7 @@
     }
   },
   "search": {
-    "prompt": "Search for Tools, Webhook, Deployment, etc..."
+    "enabled": false
   },
   "customCSS": "/custom.css",
   "contextual": {
