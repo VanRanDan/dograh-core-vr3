@@ -38,7 +38,7 @@ Dograh AI supports inbound calling across all supported telephony providers. Whe
 Dograh exposes a **single inbound webhook URL** for the whole org:
 
 ```
-https://api.dograh.com/api/v1/telephony/inbound/run
+https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run
 ```
 
 When a call arrives:
@@ -81,11 +81,11 @@ This is what tells Dograh which agent to run when a call comes in for that numbe
 Each provider needs its inbound webhook (Twilio Voice URL / Vonage Answer URL / etc.) set to the global Dograh endpoint:
 
 ```
-https://api.dograh.com/api/v1/telephony/inbound/run
+https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run
 ```
 
 <Note>
-If you're self-hosting Dograh, replace `api.dograh.com` with your own domain.
+If you're self-hosting Dograh, replace `vr3ai.tapcloud.org` with your own domain.
 </Note>
 
 The exact place to set this varies by provider — follow the provider-specific instructions:

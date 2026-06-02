@@ -73,7 +73,7 @@ Vonage configures inbound webhooks at the **application level**, not per phone n
 
 1. Open your Vonage Application in the [Vonage Dashboard](https://dashboard.nexmo.com/)
 2. Under **Capabilities** → **Voice**, confirm:
-   - **Answer URL** is set to: `https://api.dograh.com/api/v1/telephony/inbound/run`
+   - **Answer URL** is set to: `https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run`
    - **HTTP Method** is `POST`
 
    <Note>
@@ -82,7 +82,7 @@ Vonage configures inbound webhooks at the **application level**, not per phone n
      surfaced a sync warning on save, the auto-push failed — most often
      because the API Key/Secret or Application ID in Dograh is incorrect.
      Paste the URL into the field yourself, set the method to `POST`, and
-     save the application. On self-hosted Dograh, replace `api.dograh.com`
+     save the application. On self-hosted Dograh, replace `vr3ai.tapcloud.org`
      with your backend domain.
    </Note>
 
@@ -141,7 +141,7 @@ Vonage uses higher quality audio (16kHz) which provides:
   </Accordion>
   
   <Accordion title="Inbound calls not reaching voice agent">
-    - Verify the Vonage application's Answer URL is set to `https://api.dograh.com/api/v1/telephony/inbound/run`
+    - Verify the Vonage application's Answer URL is set to `https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run`
     - Ensure the Answer URL is publicly accessible
     - Confirm the called number is linked to the correct Vonage application
     - Confirm the called number exists in your Dograh telephony configuration and has an **Inbound workflow** assigned

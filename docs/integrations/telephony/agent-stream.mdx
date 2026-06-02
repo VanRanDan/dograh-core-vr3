@@ -23,10 +23,10 @@ This is useful when:
 ## Endpoint
 
 ```
-wss://app.dograh.com/api/v1/agent-stream/{agent_uuid}
+wss://vr3ai.tapcloud.org/api/v1/agent-stream/{agent_uuid}
 ```
 
-`{agent_uuid}` is the agent's stable UUID (see [Get the Agent UUID](#get-the-agent-uuid) below). On self-hosted deployments, replace `app.dograh.com` with your backend host.
+`{agent_uuid}` is the agent's stable UUID (see [Get the Agent UUID](#get-the-agent-uuid) below). On self-hosted deployments, replace `vr3ai.tapcloud.org` with your backend host.
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ To find and copy it in the UI, see [Agent UUID](/configurations/agent-uuid).
 ### Cloudonix example
 
 ```
-wss://app.dograh.com/api/v1/agent-stream/{agent_uuid}
+wss://vr3ai.tapcloud.org/api/v1/agent-stream/{agent_uuid}
   ?provider=cloudonix
   &Domain={CLOUDONIX_DOMAIN_ID}
   &callId={CALL_ID}
@@ -68,7 +68,7 @@ Use this URL inside the CXML `<Stream>` your Cloudonix Voice Application returns
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
-    <Stream url="wss://app.dograh.com/api/v1/agent-stream/{agent_uuid}?provider=cloudonix&Domain=...&callId=...&from=...&to=..."/>
+    <Stream url="wss://vr3ai.tapcloud.org/api/v1/agent-stream/{agent_uuid}?provider=cloudonix&Domain=...&callId=...&from=...&to=..."/>
   </Connect>
   <Pause length="40"/>
 </Response>

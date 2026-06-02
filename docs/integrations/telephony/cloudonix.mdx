@@ -92,7 +92,7 @@ Cloudonix routes inbound calls per **Voice Application** — the webhook URL is 
 2. Create a new application (or open the existing one whose name you configured in Dograh) with these settings:
    - **Application Resource Type**: `Remote Application Resource`
    - **Application Runtime**: `Cloudonix (CXML)`
-   - **Application URL**: `https://api.dograh.com/api/v1/telephony/inbound/run`
+   - **Application URL**: `https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run`
    - **HTTP Method**: `POST`
 3. Under **DNID Numbers**, add each phone number (DNID) you want to route through this application
 4. Save
@@ -102,7 +102,7 @@ Cloudonix routes inbound calls per **Voice Application** — the webhook URL is 
      can leave it blank during creation and let the auto-push fill it in,
      or paste the URL above so the application is usable immediately.
      Either works. Self-hosted Dograh deployments use their backend domain
-     in place of `api.dograh.com`.
+     in place of `vr3ai.tapcloud.org`.
    </Note>
 
    <img
@@ -128,7 +128,7 @@ Cloudonix routes inbound calls per **Voice Application** — the webhook URL is 
 1. Open your Cloudonix cockpit and navigate to your domain's **Applications**
 2. Open the application whose name you configured in Dograh
 3. Confirm:
-   - **URL** is set to: `https://api.dograh.com/api/v1/telephony/inbound/run`
+   - **URL** is set to: `https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run`
    - **Method** is `POST`
 
    <Note>
@@ -140,7 +140,7 @@ Cloudonix routes inbound calls per **Voice Application** — the webhook URL is 
      save, the auto-push failed — most often because the Bearer Token,
      Domain ID, or Application Name in Dograh is incorrect. Paste the URL
      into the field yourself, set the method to `POST`, and save. On
-     self-hosted Dograh, replace `api.dograh.com` with your backend domain.
+     self-hosted Dograh, replace `vr3ai.tapcloud.org` with your backend domain.
    </Note>
 
    <img

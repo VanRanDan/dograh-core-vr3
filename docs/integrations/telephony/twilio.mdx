@@ -57,7 +57,7 @@ Inbound routing is driven by the phone number itself — there is a **single web
 1. Go to **Phone Numbers** → **Manage** → **Active Numbers** in Twilio Console
 2. Click the phone number you assigned an inbound workflow to in Step 1
 3. In the **Voice Configuration** section, confirm:
-   - **Webhook** is set to: `https://api.dograh.com/api/v1/telephony/inbound/run`
+   - **Webhook** is set to: `https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run`
    - **HTTP Method** is `POST`
 
    <Note>
@@ -67,7 +67,7 @@ Inbound routing is driven by the phone number itself — there is a **single web
      credentials are incorrect or the number isn't owned by this Twilio
      account. Paste the URL into the field yourself, set the method to
      `POST`, and click **Save Configuration**. On self-hosted Dograh,
-     replace `api.dograh.com` with your backend domain.
+     replace `vr3ai.tapcloud.org` with your backend domain.
    </Note>
 
    <img
@@ -116,7 +116,7 @@ Inbound routing is driven by the phone number itself — there is a **single web
 
   <Accordion title="Inbound calls go to voicemail">
     - Verify the Twilio number's webhook is set to
-    `https://api.dograh.com/api/v1/telephony/inbound/run` - Ensure the webhook
+    `https://vr3ai.tapcloud.org/api/v1/telephony/inbound/run` - Ensure the webhook
     URL is publicly accessible from the internet - Confirm the called number
     exists in your Dograh telephony configuration and has an **Inbound
     workflow** assigned - Verify Dograh AI instance is running and responding
