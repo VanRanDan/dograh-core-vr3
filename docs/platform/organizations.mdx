@@ -1,0 +1,53 @@
+---
+title: "Organizations"
+description: "Managing organizations and switching between them"
+---
+
+## Overview
+
+Organizations are the top-level container for resources — agents, campaigns, telephony configs, and integrations all belong to an organization. A user can be a member of multiple organizations with different roles in each.
+
+## Managing Organizations
+
+Organization management is available in the **Admin Panel** → **Organizations** tab (superusers only).
+
+### Create an Organization
+
+1. Enter a name in the **New organization name** field
+2. Press **Enter** or click **Create**
+
+The org is created immediately and appears in the list.
+
+### Rename an Organization
+
+Click the **pencil icon** next to an org, edit the name inline, and press **Enter** or click **Save**.
+
+### Delete an Organization
+
+Click the **trash icon** next to an org.
+
+<Warning>
+  An organization cannot be deleted if it contains agents, campaigns, or integrations. Remove those resources first, then delete the org.
+</Warning>
+
+Deleting an org removes all org-scoped configuration (telephony configs, API keys, org settings) along with it.
+
+## Switching Organizations
+
+If your account belongs to more than one organization, an **org switcher** appears at the top of the sidebar.
+
+- **Dropdown** — shown when you have 2 or more orgs; select one to switch
+- **Label only** — shown when you belong to exactly one org
+
+Switching reloads the page to flush all org-scoped data (agents, campaigns, integrations).
+
+## Org Membership
+
+Users are added to organizations either at account creation time or manually through the Admin Panel's user detail sheet. Each user has a **role** per org:
+
+| Role | Permissions |
+|---|---|
+| `admin` | Manage team members, see all org agents, full CRUD on all resources |
+| `member` | See only agents created by them or explicitly shared; no team management |
+
+To change a user's role within an org, open their Manage sheet and adjust the role dropdown next to the org name.

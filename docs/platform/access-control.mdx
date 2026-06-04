@@ -1,0 +1,61 @@
+---
+title: "Access Control"
+description: "How roles, permissions, and resource sharing work"
+---
+
+## Overview
+
+VR3 AI uses a two-level access control model:
+
+1. **Organization role** (`admin` / `member`) — controls what a user sees within an org
+2. **Resource sharing** — grants specific members access to individual agents or tools
+
+## Organization Roles
+
+### Admin
+- Sees **all** agents, campaigns, recordings, and integrations in the org
+- Can manage team members (add, remove, change roles)
+- Full create/edit/delete on all resources
+
+### Member
+- Sees only resources they **created** or that have been **explicitly shared** with them
+- Cannot manage team members
+- Cannot see or modify other members' unshared resources
+
+## Sharing an Agent with a Member
+
+By default, agents created by one user are not visible to other members. To share:
+
+1. Open the agent in the editor
+2. Navigate to **Settings** → **Sharing** (or the share icon)
+3. Select the user or role to share with
+4. Choose a permission level:
+   - `view_only` — can see the agent and its runs
+   - `run_only` — can trigger runs
+   - `edit` — full edit access
+
+Permission hierarchy: `edit` > `run_only` > `view_only`.
+
+<Tip>
+  If you want all members to see an agent, share it with the `member` role rather than adding each person individually.
+</Tip>
+
+## Superuser Access
+
+Accounts with `is_superuser = true` have platform-wide access:
+- Can access the Admin Panel
+- Can manage any user in any organization
+- Can create/rename/delete organizations
+- Can toggle superuser status on other accounts (cannot remove their own)
+
+Superuser status is set by an existing superuser from the Admin Panel → Users → Manage → Superuser toggle.
+
+## Summary
+
+| What they want to do | Requirement |
+|---|---|
+| See another member's agent | Agent must be shared with them or the `member` role |
+| Manage team members | Must be org `admin` |
+| Access the Admin Panel | Must be `is_superuser` |
+| Create a new user | Must be `is_superuser` |
+| Create/delete organizations | Must be `is_superuser` |

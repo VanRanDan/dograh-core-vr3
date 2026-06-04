@@ -4,36 +4,37 @@ title: "Introduction"
 
 ## About VR3 AI
 
-**VR3 AI is an open-source alternative to platforms like Vapi and Retell** - VR3 AI helps you build voice AI agents with an easy drag-and-drop workflow builder. Unlike proprietary solutions like Vapi, VR3 AI gives you:
-- **100% open source** - no vendor lock-in, full transparency
-- **Self-hostable** - deploy anywhere, own your infrastructure  
-- **Complete control** - every line of code is open and customizable
-- **2-minute setup** - from zero to working voice bot in under 2 minutes
+**VR3 AI is VanRan's internal voice agent platform** — built on top of the open-source [dograh](https://github.com/dograh-hq/dograh) project and customized for building, deploying, and maintaining customer-facing voice agents.
 
-## Overview
-Watch the following video to learn about VR3 AI’s capabilities.
+The platform is self-hosted on VanRan's infrastructure and is accessible to authorized team members only.
 
-<iframe
-  className="w-full aspect-video rounded-xl"
-  src="https://www.youtube.com/embed/sxiSp4JXqws"
-  title="VR3 AI Overview"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+## Accessing the Platform
 
+VR3 AI is deployed at **[vr3ai.tapcloud.org](https://vr3ai.tapcloud.org)** (production) and **[192.11.0.36](https://192.11.0.36)** (QA/staging).
 
-## Setting up
+<Note>
+  Accounts are provisioned by a platform administrator. There is no public sign-up. Contact your administrator to get access.
+</Note>
 
-Get the platform up and running using Docker with a single command on your local computer. If you are looking to deploy the platform on a server different than your local machine, please check the [Deployment](deployment/introduction) section.
+### Logging In
 
-<Note>We collect anonymous usage data to improve the product. You can opt out by setting the `ENABLE_TELEMETRY` to `false` in the below command.</Note>
+1. Navigate to your environment's URL
+2. Enter your email and password
+3. If this is your first login, you will be prompted to set a new password before continuing
 
-```bash
-curl -o docker-compose.yaml https://raw.githubusercontent.com/dograh-hq/dograh/main/docker-compose.yaml && REGISTRY=ghcr.io/dograh-hq ENABLE_TELEMETRY=true docker compose up --pull always
-```
+### Switching Organizations
 
-Please check [Prerequisites](getting-started/prerequisites) for the system requirements and [Troubleshooting](getting-started/troubleshooting) for common issues.
+If your account belongs to multiple organizations, you can switch between them using the org selector in the top-left of the sidebar. The page reloads automatically to reflect the selected organization's resources.
+
+## What You Can Build
+
+- **Voice Agents** — drag-and-drop workflow builder for inbound and outbound voice AI
+- **Campaigns** — automated outbound call campaigns to contact lists
+- **Knowledge Bases** — attach documents for retrieval-augmented generation
+- **Telephony Integrations** — connect Twilio, Telnyx, Bandwidth, and other providers
 
 ## Next Steps
 
-You can see how to configure the inference provider in [Inference Provider](/configurations/inference-providers).
+- [Configure your inference provider](/configurations/inference-providers) — set up LLM, TTS, and STT
+- [Build your first voice agent](/voice-agent/introduction) — create a workflow
+- [Set up telephony](/integrations/telephony/overview) — connect a phone number

@@ -29,6 +29,14 @@
             ]
           },
           {
+            "group": "Platform",
+            "pages": [
+              "platform/user-management",
+              "platform/organizations",
+              "platform/access-control"
+            ]
+          },
+          {
             "group": "Core Concepts",
             "pages": [
               "core-concepts/how-dograh-works",

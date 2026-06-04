@@ -1,0 +1,61 @@
+---
+title: "User Management"
+description: "Creating, managing, and removing user accounts from the admin panel"
+---
+
+## Overview
+
+User accounts are managed exclusively by platform administrators through the **Admin Panel**. There is no public sign-up — all accounts are provisioned by a superuser.
+
+<Note>
+  The Admin Panel is only visible to accounts with `is_superuser` enabled. Contact your administrator if you need access.
+</Note>
+
+## Accessing the Admin Panel
+
+1. Log in as a superuser account
+2. Click your avatar in the bottom-left of the sidebar
+3. Select **Admin** from the dropdown
+4. Navigate to `/settings/admin`
+
+## Creating a User
+
+1. Go to the **Users** tab in the Admin Panel
+2. Click **Create User**
+3. Fill in:
+   - **Email** — the user's email address
+   - **Temporary password** — minimum 8 characters; the user will be required to change this on first login
+   - **Organization** — the org they'll be added to immediately
+   - **Role** — `member` or `admin` within that organization
+4. Click **Create User**
+
+The user can now log in. On their first login, an undismissable prompt will require them to set a new password.
+
+## Managing a User
+
+Click **Manage** next to any user to open their detail panel, where you can:
+
+- **Org Memberships** — view all orgs the user belongs to, change their role per org, or remove them from an org
+- **Add to Organization** — add the user to an additional org with a chosen role
+- **Set Active Organization** — override which org the user lands in on login
+- **Superuser** — toggle platform-wide admin access (disabled on your own account to prevent lockout)
+
+## Deleting a User
+
+Click the **trash icon** next to a user row. A confirmation prompt appears before deletion.
+
+<Warning>
+  Deletion is permanent. The user's account is removed and their authorship on agents, campaigns, and API keys is cleared. Their created resources (agents, campaigns, etc.) are preserved but become unowned.
+</Warning>
+
+You cannot delete your own account.
+
+## Roles
+
+| Role | Scope | What they can see |
+|---|---|---|
+| `is_superuser` | Platform-wide | Admin panel, all organizations, all users |
+| `admin` | Per-organization | All agents in their org, team management |
+| `member` | Per-organization | Only agents they created or that are explicitly shared with them |
+
+See [Access Control](/platform/access-control) for details on how sharing works.
