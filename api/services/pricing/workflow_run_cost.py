@@ -4,6 +4,7 @@ from loguru import logger
 
 from api.db import db_client
 from api.enums import WorkflowRunMode
+from api.services.billing.usage_emitter import emit_settlement
 from api.services.pricing.cost_calculator import cost_calculator
 from api.services.telephony.factory import get_telephony_provider_for_run
 
@@ -221,6 +222,8 @@ async def calculate_workflow_run_cost(workflow_run_id: int):
             else:
                 logger.error(f"Failed to update organization usage: {e}")
             # Don't fail the whole cost calculation if usage update fails
+
+        await emit_settlement(workflow_run, cost_info)
 
         logger.info(
             f"Calculated cost for workflow run: ${cost_info['total_cost_usd']:.6f} USD ({cost_info['dograh_token_usage']} Dograh Tokens)"

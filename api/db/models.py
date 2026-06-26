@@ -117,6 +117,26 @@ class OrganizationModel(Base):
 
     price_per_second_usd = Column(Float, nullable=True)
 
+    # --- Billing (Lago) ---
+    lago_customer_id = Column(String, nullable=True)
+    billing_plan_code = Column(String, nullable=True)
+    overage_policy = Column(
+        Enum("allow", "cap", "block", name="overage_policy"),
+        nullable=False,
+        default="block",
+        server_default=text("'block'::overage_policy"),
+    )
+    overage_cap_pct = Column(Integer, nullable=True)
+    included_voice_minutes = Column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+    included_ai_cost_cents = Column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+    billing_suspended = Column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
+
     # Relationships
     users = relationship(
         "UserModel",
@@ -611,6 +631,11 @@ class OrganizationUsageCycleModel(Base):
     # New USD tracking fields
     used_amount_usd = Column(Float, nullable=True, default=0)
     quota_amount_usd = Column(Float, nullable=True)
+    # --- Billing meters ---
+    used_voice_minutes = Column(Float, nullable=False, default=0, server_default=text("0"))
+    used_ai_cost_cents = Column(Float, nullable=False, default=0, server_default=text("0"))
+    allowance_voice_minutes = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    allowance_ai_cost_cents = Column(Integer, nullable=False, default=0, server_default=text("0"))
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     updated_at = Column(
         DateTime(timezone=True),
@@ -1305,4 +1330,31 @@ class KnowledgeBaseChunkModel(Base):
             postgresql_with={"lists": 100},  # Adjust based on dataset size
             postgresql_ops={"embedding": "vector_cosine_ops"},
         ),
+    )
+
+
+class BillingEventOutboxModel(Base):
+    """Transactional outbox for at-least-once, idempotent Lago usage events."""
+
+    __tablename__ = "billing_event_outbox"
+
+    id = Column(Integer, primary_key=True, index=True)
+    workflow_run_id = Column(Integer, ForeignKey("workflow_runs.id"), nullable=False)
+    metric_code = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
+    recompute_seq = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    transaction_id = Column(String, nullable=False, unique=True, index=True)
+    status = Column(
+        Enum("pending", "sent", "failed", name="outbox_status"),
+        nullable=False,
+        default="pending",
+        server_default=text("'pending'::outbox_status"),
+    )
+    attempts = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    last_error = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    sent_at = Column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        Index("idx_outbox_status_created", "status", "created_at"),
     )

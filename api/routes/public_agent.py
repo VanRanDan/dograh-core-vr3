@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from api.db import db_client
 from api.enums import TriggerState, WorkflowStatus
-from api.services.quota_service import check_dograh_quota_by_user_id
+from api.services.billing.enforcement import check_and_reserve, resolve_billing_org_id
 from api.services.telephony.factory import (
     get_default_telephony_provider,
     get_telephony_provider_by_id,
@@ -179,11 +179,10 @@ async def _execute_resolved_target(
     """Shared execution path once the target workflow has been resolved."""
     execution_user_id = _get_execution_user_id(target.workflow)
 
-    # Check Dograh quota using the workflow owner's config and model overrides.
-    quota_result = await check_dograh_quota_by_user_id(
-        execution_user_id,
-        workflow_id=target.workflow.id,
-    )
+    # Provisioned-only billing gate, resolving the org via the workflow owner
+    # (same org the settlement emitter will settle against).
+    org_id = await resolve_billing_org_id(target.workflow.id)
+    quota_result = await check_and_reserve(org_id, workflow_id=target.workflow.id)
     if not quota_result.has_quota:
         raise HTTPException(status_code=402, detail=quota_result.error_message)
 

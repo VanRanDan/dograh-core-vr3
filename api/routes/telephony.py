@@ -25,7 +25,7 @@ from api.enums import CallType, WorkflowRunState
 from api.errors.telephony_errors import TelephonyError
 from api.sdk_expose import sdk_expose
 from api.services.auth.depends import get_user
-from api.services.quota_service import check_dograh_quota_by_user_id
+from api.services.billing.enforcement import check_and_reserve, resolve_billing_org_id
 from api.services.telephony.call_transfer_manager import get_call_transfer_manager
 from api.services.telephony.factory import (
     get_all_telephony_providers,
@@ -132,11 +132,10 @@ async def initiate_call(
         raise HTTPException(status_code=404, detail="Workflow not found")
     execution_user_id = _get_execution_user_id(workflow)
 
-    # Check Dograh quota before initiating the call (apply per-workflow
-    # model_overrides so the keys we will actually use are the ones checked).
-    quota_result = await check_dograh_quota_by_user_id(
-        execution_user_id, workflow_id=workflow.id
-    )
+    # Provisioned-only billing gate, resolving the org via the workflow owner
+    # (same org the settlement emitter will settle against).
+    org_id = await resolve_billing_org_id(workflow.id)
+    quota_result = await check_and_reserve(org_id, workflow_id=workflow.id)
     if not quota_result.has_quota:
         raise HTTPException(status_code=402, detail=quota_result.error_message)
 
@@ -735,10 +734,10 @@ async def handle_inbound_run(request: Request):
                 TelephonyError.SIGNATURE_VALIDATION_FAILED
             )
 
-        # 4. Quota check (use the workflow's model_overrides if set).
-        quota_result = await check_dograh_quota_by_user_id(
-            user_id, workflow_id=workflow_id
-        )
+        # 4. Provisioned-only billing gate (resolve org via the workflow owner,
+        # the same org the settlement emitter will settle against).
+        org_id = await resolve_billing_org_id(workflow_id)
+        quota_result = await check_and_reserve(org_id, workflow_id=workflow_id)
         if not quota_result.has_quota:
             logger.warning(
                 f"User {user_id} has exceeded quota: {quota_result.error_message}"
@@ -870,11 +869,11 @@ async def handle_inbound_telephony(
             logger.error(f"Request validation failed: {error_type}")
             return provider_class.generate_validation_error_response(error_type)
 
-        # Check quota before processing (apply per-workflow model_overrides).
+        # Provisioned-only billing gate (resolve org via the workflow owner,
+        # the same org the settlement emitter will settle against).
         user_id = workflow_context["user_id"]
-        quota_result = await check_dograh_quota_by_user_id(
-            user_id, workflow_id=workflow_id
-        )
+        org_id = await resolve_billing_org_id(workflow_id)
+        quota_result = await check_and_reserve(org_id, workflow_id=workflow_id)
         if not quota_result.has_quota:
             logger.warning(
                 f"User {user_id} has exceeded quota for inbound calls: {quota_result.error_message}"

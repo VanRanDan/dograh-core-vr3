@@ -69,6 +69,11 @@ LOG_RETENTION = os.getenv("LOG_RETENTION", "7 days")
 LOG_COMPRESSION = os.getenv("LOG_COMPRESSION", "gz")
 ENABLE_TELEMETRY = os.getenv("ENABLE_TELEMETRY", "false").lower() == "true"
 
+# Lago billing configuration
+LAGO_API_URL = os.getenv("LAGO_API_URL", "http://lago-api:3000")
+LAGO_API_KEY = os.getenv("LAGO_API_KEY", "")
+LAGO_WEBHOOK_SECRET = os.getenv("LAGO_WEBHOOK_SECRET", "")
+
 
 def _get_version() -> str:
     """Read version from pyproject.toml."""
