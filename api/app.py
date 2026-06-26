@@ -33,6 +33,7 @@ from loguru import logger
 
 from api.constants import REDIS_URL
 from api.mcp_server import mcp
+from api.routes.billing_webhooks import router as billing_webhooks_router
 from api.routes.main import router as main_router
 from api.services.pipecat.tracing_config import (
     handle_langfuse_sync,
@@ -121,6 +122,7 @@ api_router = APIRouter()
 
 # include subrouters here
 api_router.include_router(main_router)
+api_router.include_router(billing_webhooks_router)
 
 # main router with api prefix
 app.include_router(api_router, prefix=API_PREFIX)
