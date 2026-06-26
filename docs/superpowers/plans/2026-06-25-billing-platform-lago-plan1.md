@@ -1609,4 +1609,18 @@ git commit -m "feat(billing): Lago webhooks for suspend/resume"
 
 **Deferred to Plan 2 (documented, not gaps):** prod cutover (§14 step 7), Stripe Phase B (§13), at-scale org backfill, admin UI, closed-period hard-overwrite rollover pass.
 
+## Plan-2 Followups (tracked — surfaced during Plan-1 implementation + final review)
+
+These are deliberate deferrals, not defects. Shadow-mode rollout (emission decoupled from gating) is what makes shipping without them safe — but they must be tracked:
+
+- **Outbox retry/backoff/dead-letter:** failed rows are currently terminal (drainer fetches only `pending`); a transient Lago blip strands that usage event. Add bounded retry using the existing `attempts` column (transient failure → keep `pending` / requeue with ceiling). Revenue-leak surface — highest-priority followup.
+- **`create_subscription` idempotency:** a `provision_org` retry after a partial failure creates a duplicate Lago subscription. Mitigate by checking `lago_customer_id` first or handling Lago's 409 (the `external_id` is already deterministic `org-{id}`).
+- **Closed-period reconciliation:** reconcile only does `max` on the OPEN cycle; add a cycle-rollover pass that hard-overwrites the just-closed period to Lago's final number before invoicing.
+- **Live-Lago field-path verification:** `lago_client.get_current_usage` / `get_plan` JSON paths are best-effort; validate against the real lago-dev (and drop the redundant `external_subscription_id` query param on `get_current_usage`).
+- **`reconcile_billing` unbounded org load:** loads all provisioned orgs into memory; batch/paginate when org count grows.
+- **Text-chat billing:** `routes/workflow_text_chat.py` is intentionally left on the legacy quota (no `calculate_workflow_run_cost → emit_settlement` hook, so the reserve gate would strand the reservation). Add a text-session settlement hook before gating it.
+- **`estimate_units` workflow-aware:** currently a fixed floor `(1.0, 25.0)`; gate and emitter now both pass `workflow_id` so they stay aligned when this becomes per-workflow.
+- **`settle_run_usage` double cycle-fetch:** minor perf (first fetch unlocked, then re-`SELECT FOR UPDATE`); could add a `for_update` flag to `_get_or_create_current_cycle_impl`.
+- **`reconcile_billing` import shim:** `billing_tasks.py` re-exports `reconcile_billing` only for arq; import it directly from `reconciliation.py` in `arq.py` and drop the shim.
+
 **Verification-before-completion gate:** Plan is done only when `cd api && .venv/Scripts/python.exe -m pytest tests/billing/ -v` is green AND a provisioned test org on lago-dev shows: reserve on call-start, settle to actual post-call, event in Lago, invoice generated, and block/cap enforced.
