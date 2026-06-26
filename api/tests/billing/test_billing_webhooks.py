@@ -55,7 +55,7 @@ async def test_payment_failure_suspends(billing_client, seed_org, async_session,
 
     org = await seed_org(lago_customer_id="org-9", billing_suspended=False)
 
-    payload = {"webhook_type": "invoice.payment_failure", "lago_customer_id": "org-9"}
+    payload = {"webhook_type": "invoice.payment_failure", "invoice": {"customer": {"external_id": "org-9"}}}
     body = json.dumps(payload).encode()
     sig = _make_sig("testsecret", body)
 
@@ -80,7 +80,7 @@ async def test_payment_success_resumes(billing_client, seed_org, async_session, 
 
     org = await seed_org(lago_customer_id="org-10", billing_suspended=True)
 
-    payload = {"webhook_type": "invoice.payment_success", "lago_customer_id": "org-10"}
+    payload = {"webhook_type": "invoice.payment_success", "invoice": {"customer": {"external_id": "org-10"}}}
     body = json.dumps(payload).encode()
     sig = _make_sig("testsecret", body)
 
@@ -100,12 +100,37 @@ async def test_payment_success_resumes(billing_client, seed_org, async_session, 
 
 
 @pytest.mark.asyncio
+async def test_subscription_terminated_suspends(billing_client, seed_org, async_session, monkeypatch):
+    monkeypatch.setattr("api.routes.billing_webhooks.LAGO_WEBHOOK_SECRET", "testsecret")
+
+    org = await seed_org(lago_customer_id="org-12", billing_suspended=False)
+
+    payload = {"webhook_type": "subscription.terminated", "subscription": {"external_customer_id": "org-12"}}
+    body = json.dumps(payload).encode()
+    sig = _make_sig("testsecret", body)
+
+    response = await billing_client.post(
+        API_PREFIX + "/billing/webhooks/lago",
+        content=body,
+        headers={"Content-Type": "application/json", "X-Lago-Signature": sig},
+    )
+
+    assert response.status_code == 200
+
+    result = await async_session.execute(
+        select(OrganizationModel).where(OrganizationModel.id == org.id)
+    )
+    updated_org = result.scalar_one()
+    assert updated_org.billing_suspended is True
+
+
+@pytest.mark.asyncio
 async def test_bad_signature_returns_401(billing_client, seed_org, monkeypatch):
     monkeypatch.setattr("api.routes.billing_webhooks.LAGO_WEBHOOK_SECRET", "testsecret")
 
     await seed_org(lago_customer_id="org-11", billing_suspended=False)
 
-    payload = {"webhook_type": "invoice.payment_failure", "lago_customer_id": "org-11"}
+    payload = {"webhook_type": "invoice.payment_failure", "invoice": {"customer": {"external_id": "org-11"}}}
     body = json.dumps(payload).encode()
 
     response = await billing_client.post(

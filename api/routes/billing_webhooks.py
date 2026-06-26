@@ -4,6 +4,7 @@ Suspends or resumes an organisation's billing based on Lago payment/subscription
 """
 import hashlib
 import hmac
+import json
 
 from fastapi import APIRouter, Header, HTTPException, Request
 from loguru import logger
@@ -50,14 +51,13 @@ async def lago_webhook(
     if not _verify(body, x_lago_signature):
         raise HTTPException(status_code=401, detail="bad signature")
 
-    payload = await request.json()
+    payload = json.loads(body)
     wtype = payload.get("webhook_type", "")
 
-    # Extract external_id — try nested Lago structures first, then flat top-level key
+    # Extract external_id from either the invoice or subscription payload shape.
     external_id = (
         payload.get("invoice", {}).get("customer", {}).get("external_id")
         or payload.get("subscription", {}).get("external_customer_id")
-        or payload.get("lago_customer_id")
     )
 
     if not external_id:
