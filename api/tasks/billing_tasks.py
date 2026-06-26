@@ -11,6 +11,7 @@ from loguru import logger
 
 from api.db import db_client
 from api.services.billing.lago_client import lago_client
+from api.services.billing.reconciliation import reconcile_billing  # noqa: F401
 
 
 async def drain_billing_outbox(ctx) -> int:

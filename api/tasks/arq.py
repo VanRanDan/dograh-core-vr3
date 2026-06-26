@@ -41,7 +41,7 @@ REDIS_SETTINGS = RedisSettings(
 
 from arq import cron
 
-from api.tasks.billing_tasks import drain_billing_outbox
+from api.tasks.billing_tasks import drain_billing_outbox, reconcile_billing
 from api.tasks.campaign_tasks import (
     process_campaign_batch,
     sync_campaign_source,
@@ -63,9 +63,11 @@ class WorkerSettings:
         process_campaign_batch,
         process_knowledge_base_document,
         drain_billing_outbox,
+        reconcile_billing,
     ]
     cron_jobs = [
         cron(drain_billing_outbox, second={0, 20, 40}),  # ~every 20s
+        cron(reconcile_billing, minute={0, 15, 30, 45}),  # every 15 min
     ]
     redis_settings = REDIS_SETTINGS
     max_jobs = 10
