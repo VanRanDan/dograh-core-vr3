@@ -1,5 +1,4 @@
 import httpx
-from loguru import logger
 
 from api.constants import LAGO_API_KEY, LAGO_API_URL
 

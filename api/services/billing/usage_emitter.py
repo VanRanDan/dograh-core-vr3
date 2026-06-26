@@ -41,8 +41,9 @@ async def emit_settlement(workflow_run, cost_info: dict | None) -> None:
         return
 
     voice_minutes, ai_cost_cents = compute_meters(cost_info)
-    # Recompute the estimate the gate reserved (deterministic in Plan 1).
-    est_minutes, est_cents = estimate_units(None)
+    # Recompute the estimate the gate reserved, keyed on the same workflow_id
+    # the gate used — keeps the two aligned if the estimator becomes workflow-aware.
+    est_minutes, est_cents = estimate_units(workflow_run.workflow_id)
 
     try:
         await db_client.settle_run_usage(

@@ -44,7 +44,7 @@ async def resolve_billing_org_id(workflow_id: int | None) -> int | None:
     return org_id
 
 
-async def check_and_reserve(org_id: int, workflow_id: int | None = None) -> QuotaCheckResult:
+async def check_and_reserve(org_id: int | None, workflow_id: int | None = None) -> QuotaCheckResult:
     """
     Provisioned-only enforcement gate.
 

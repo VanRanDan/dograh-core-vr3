@@ -10,6 +10,7 @@ Shadow-mode rollout: events flow to Lago; the call gate is unchanged.
 from loguru import logger
 
 from api.db import db_client
+from api.services.billing.enforcement import resolve_billing_org_id
 from api.services.billing.lago_client import lago_client
 from api.services.billing.reconciliation import reconcile_billing  # noqa: F401
 
@@ -19,10 +20,11 @@ async def drain_billing_outbox(ctx) -> int:
     Drain pending billing outbox rows to Lago.
 
     For each pending row:
-      1. Fetch the workflow run to resolve organization_id (no lazy-load;
-         each row opens its own session via the facade methods).
-      2. Fetch the workflow to get organization_id.
-      3. Derive subscription id as f"org-{organization_id}".
+      1. Fetch the workflow run.
+      2. Resolve org via resolve_billing_org_id (shared with gate/emitter;
+         falls back to owner's selected_organization_id when wf.organization_id
+         is NULL, preventing permanent local↔Lago drift).
+      3. Derive subscription id as f"org-{org_id}".
       4. Send the event to Lago.
       5. Mark the row sent on success, failed on any exception.
 
@@ -40,15 +42,8 @@ async def drain_billing_outbox(ctx) -> int:
                 )
                 continue
 
-            wf = await db_client.get_workflow_by_id(run.workflow_id)
-            if wf is None:
-                await db_client.mark_billing_event_failed(
-                    row.id, f"workflow {run.workflow_id} not found"
-                )
-                continue
-
-            org_id = wf.organization_id
-            if not org_id:
+            org_id = await resolve_billing_org_id(run.workflow_id)
+            if org_id is None:
                 await db_client.mark_billing_event_failed(
                     row.id, "no organization for run"
                 )
@@ -69,7 +64,12 @@ async def drain_billing_outbox(ctx) -> int:
             logger.error(
                 f"Outbox drain failed for transaction {row.transaction_id}: {e}"
             )
-            await db_client.mark_billing_event_failed(row.id, str(e))
+            try:
+                await db_client.mark_billing_event_failed(row.id, str(e))
+            except Exception as mark_err:
+                logger.error(
+                    f"Could not mark billing event {row.id} failed: {mark_err}"
+                )
 
     if pending:
         logger.info(

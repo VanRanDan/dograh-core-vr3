@@ -21,6 +21,8 @@ async def provision_org(
 
     async with db_client.async_session() as s:
         org = await s.get(OrganizationModel, org_id)
+        if org is None:
+            raise ValueError(f"organization {org_id} not found")
         org.lago_customer_id = external_id
         org.billing_plan_code = plan_code
         org.included_voice_minutes = plan["voice_minutes_free"]
