@@ -103,6 +103,9 @@ def _require_selected_organization_id(user: UserModel) -> int:
 
 
 async def _ensure_text_chat_quota(user: UserModel, workflow_id: int) -> None:
+    # Text-chat billing is deferred to Plan 2: this path has no settlement hook
+    # (no calculate_workflow_run_cost -> emit_settlement), so gating it with the
+    # provisioned reserve gate would strand the reservation. Stays on legacy quota.
     quota_result = await check_dograh_quota(user, workflow_id=workflow_id)
     if not quota_result.has_quota:
         raise HTTPException(status_code=402, detail=quota_result.error_message)

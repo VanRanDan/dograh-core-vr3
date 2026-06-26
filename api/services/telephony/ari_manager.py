@@ -26,7 +26,7 @@ from loguru import logger
 from api.constants import REDIS_URL
 from api.db import db_client
 from api.enums import CallType, WorkflowRunMode
-from api.services.quota_service import check_dograh_quota_by_user_id
+from api.services.billing.enforcement import check_and_reserve, resolve_billing_org_id
 from api.services.telephony.call_transfer_manager import get_call_transfer_manager
 from api.services.telephony.transfer_event_protocol import (
     TransferEvent,
@@ -564,9 +564,11 @@ class ARIConnection:
 
             user_id = workflow.user_id
 
-            # 3. Check quota (apply per-workflow model_overrides).
-            quota_result = await check_dograh_quota_by_user_id(
-                user_id, workflow_id=inbound_workflow_id
+            # 3. Provisioned-only billing gate (resolve org via the workflow
+            # owner, the same org the settlement emitter will settle against).
+            org_id = await resolve_billing_org_id(inbound_workflow_id)
+            quota_result = await check_and_reserve(
+                org_id, workflow_id=inbound_workflow_id
             )
             if not quota_result.has_quota:
                 logger.warning(

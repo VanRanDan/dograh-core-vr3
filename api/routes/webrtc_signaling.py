@@ -45,7 +45,7 @@ from api.services.pipecat.ws_sender_registry import (
     register_ws_sender,
     unregister_ws_sender,
 )
-from api.services.quota_service import check_dograh_quota
+from api.services.billing.enforcement import check_and_reserve, resolve_billing_org_id
 
 router = APIRouter(prefix="/ws")
 
@@ -327,9 +327,10 @@ class SignalingManager:
         if org_id:
             set_current_org_id(org_id)
 
-        # Check Dograh quota before initiating the call (apply per-workflow
-        # model_overrides so we evaluate the keys this workflow will use).
-        quota_result = await check_dograh_quota(user, workflow_id=workflow_id)
+        # Provisioned-only billing gate (resolve org via the workflow owner,
+        # the same org the settlement emitter will settle against).
+        org_id = await resolve_billing_org_id(workflow_id)
+        quota_result = await check_and_reserve(org_id, workflow_id=workflow_id)
         if not quota_result.has_quota:
             # Send error response for quota issues
             await ws.send_json(
