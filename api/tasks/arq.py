@@ -39,6 +39,9 @@ REDIS_SETTINGS = RedisSettings(
     ssl_check_hostname=False if use_ssl else None,
 )
 
+from arq import cron
+
+from api.tasks.billing_tasks import drain_billing_outbox
 from api.tasks.campaign_tasks import (
     process_campaign_batch,
     sync_campaign_source,
@@ -59,8 +62,11 @@ class WorkerSettings:
         sync_campaign_source,
         process_campaign_batch,
         process_knowledge_base_document,
+        drain_billing_outbox,
     ]
-    cron_jobs = []
+    cron_jobs = [
+        cron(drain_billing_outbox, second={0, 20, 40}),  # ~every 20s
+    ]
     redis_settings = REDIS_SETTINGS
     max_jobs = 10
 
