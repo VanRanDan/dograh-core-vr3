@@ -171,10 +171,10 @@ Infra/ops task (no TDD). Deliverable: a reachable lago-dev with two billable met
 
 - [ ] **Step 1: Write the compose stack**
 
-Base it on the official Lago self-host compose (api, front, worker, clock, pg, redis, clickhouse). Key env in `.env.example`:
+Base it on the official Lago self-host compose (api, front, worker, clock, pg, redis, clickhouse). Bind the stack to the dedicated VR3 macvlan IP **192.11.0.39** (fits the map: Langfuse infra .35/.36, Hermes .38). Key env in `.env.example`:
 
 ```env
-LAGO_API_URL=http://lago-api:3000
+LAGO_API_URL=http://192.11.0.39:3000     # macvlan IP; how Dograh reaches Lago server-to-server
 LAGO_FRONT_URL=https://vr3ai-billing-dev.tapcloud.org
 API_URL=https://vr3ai-billing-dev.tapcloud.org/api
 LAGO_RSA_PRIVATE_KEY=__base64_generated__
@@ -183,6 +183,8 @@ LAGO_ENCRYPTION_PRIMARY_KEY=__generated__
 LAGO_ENCRYPTION_DETERMINISTIC_KEY=__generated__
 LAGO_ENCRYPTION_KEY_DERIVATION_SALT=__generated__
 ```
+
+The Dograh stack's `LAGO_API_URL` env points at `http://192.11.0.39:3000`; nginx proxies the public host `vr3ai-billing-dev.tapcloud.org` to 192.11.0.39.
 
 - [ ] **Step 2: Deploy to dev host (192.11.0.36) as a Dockge stack**
 

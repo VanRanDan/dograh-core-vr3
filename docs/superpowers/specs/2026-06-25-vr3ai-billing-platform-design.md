@@ -298,18 +298,19 @@ vocabulary).
 Dockge stack "lago" (prod) / "lago-dev" (dev/qa)
   services: lago-api, lago-front, lago-worker, lago-clock,
             lago-pg, lago-redis, lago-clickhouse
+  macvlan IP: 192.11.0.39  (dedicated, fits VR3 map: Langfuse infra .35/.36, Hermes .38)
   secrets (stack .env, not committed): LAGO_RSA_PRIVATE_KEY, LAGO_API_KEY,
             webhook HMAC, encryption secrets
 
 Public host (to provision; not yet in DNS):
   vr3ai-billing.tapcloud.org
-    /      -> lago-front (admin UI)
+    /      -> lago-front (admin UI)   [nginx proxies to 192.11.0.39]
     /api   -> lago-api   (browser-facing API; same cert, path-based)
   TLS: Let's Encrypt via existing nginx flow
   DNS:  new A/CNAME record required
 
-Dograh -> Lago (server-to-server): internal docker/macvlan only
-  LAGO_API_URL=http://lago-api:3000   # NEVER the public host
+Dograh -> Lago (server-to-server): internal VR3 network via the macvlan IP
+  LAGO_API_URL=http://192.11.0.39:3000   # NEVER the public host
 Dograh stack env: LAGO_API_URL, LAGO_API_KEY, LAGO_WEBHOOK_SECRET
 ```
 
