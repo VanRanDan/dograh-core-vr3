@@ -16,6 +16,34 @@ _METERS = [
 ]
 
 
+async def resolve_billing_org_id(workflow_id: int | None) -> int | None:
+    """Resolve the billing org for a workflow.
+
+    Single source of truth shared by the call-start gate sites and the
+    post-call settlement emitter so both reserve/settle against the SAME org.
+
+    Resolution order (mirrors the workflow OWNER the gate has always used):
+      1. workflow.organization_id, else
+      2. owner user's selected_organization_id.
+
+    Returns None when workflow_id is None, the workflow is missing, or no org
+    can be derived. No relationships are lazy-loaded on detached objects.
+    """
+    if workflow_id is None:
+        return None
+
+    wf = await db_client.get_workflow_by_id(workflow_id)
+    if wf is None:
+        return None
+
+    org_id = wf.organization_id
+    if org_id is None and wf.user_id is not None:
+        user = await db_client.get_user_by_id(wf.user_id)
+        org_id = user.selected_organization_id if user else None
+
+    return org_id
+
+
 async def check_and_reserve(org_id: int, workflow_id: int | None = None) -> QuotaCheckResult:
     """
     Provisioned-only enforcement gate.

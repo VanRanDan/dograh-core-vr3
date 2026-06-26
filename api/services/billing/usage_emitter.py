@@ -7,6 +7,8 @@ delta and enqueues outbox events for Lago. Billing failure never raises.
 from loguru import logger
 
 from api.db import db_client
+from api.services.billing.enforcement import resolve_billing_org_id
+from api.services.billing.estimator import estimate_units
 from api.services.billing.meters import compute_meters
 
 
@@ -18,12 +20,18 @@ async def emit_settlement(workflow_run, cost_info: dict | None) -> None:
       - org_id cannot be resolved from the workflow run
       - org is not found or has no lago_customer_id (not provisioned)
 
+    Org resolution and the reservation estimate MUST match the call-start gate
+    (`check_and_reserve`): the org comes from the shared `resolve_billing_org_id`
+    helper keyed on the run's workflow_id, and the est is RECOMPUTED via
+    `estimate_units(None)` — the same deterministic value the gate reserved —
+    so `settle_run_usage` nets the cycle to the actual.
+
     Billing failure is caught and logged — never propagates.
     """
     if not cost_info:
         return
 
-    org_id = _resolve_org_id(workflow_run)
+    org_id = await resolve_billing_org_id(workflow_run.workflow_id)
     if org_id is None:
         return
 
@@ -33,9 +41,8 @@ async def emit_settlement(workflow_run, cost_info: dict | None) -> None:
         return
 
     voice_minutes, ai_cost_cents = compute_meters(cost_info)
-    reservation = cost_info.get("billing_reservation") or {}
-    est_minutes = float(reservation.get("est_minutes", 0))
-    est_cents = float(reservation.get("est_cents", 0))
+    # Recompute the estimate the gate reserved (deterministic in Plan 1).
+    est_minutes, est_cents = estimate_units(None)
 
     try:
         await db_client.settle_run_usage(
@@ -50,13 +57,3 @@ async def emit_settlement(workflow_run, cost_info: dict | None) -> None:
         logger.error(
             f"Billing settle failed for run {workflow_run.id}: {exc}"
         )
-
-
-def _resolve_org_id(workflow_run) -> int | None:
-    wf = getattr(workflow_run, "workflow", None)
-    org_id = getattr(wf, "organization_id", None)
-    if org_id is None and wf is not None:
-        user = getattr(wf, "user", None)
-        if user is not None:
-            org_id = getattr(user, "selected_organization_id", None)
-    return org_id
